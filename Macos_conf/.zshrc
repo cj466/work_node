@@ -3,8 +3,10 @@ ZSH_DISABLE_COMPFIX=true
 
 # Path to your oh-my-zsh installation.
 export ZSH="/Users/sunhongfan/.oh-my-zsh"
+export LANG=en_US.UTF-8
 
-#ZSH_THEME="robbyrussell"
+
+ZSH_THEME="robbyrussell"
 ZSH_THEME="myys"
 
 plugins=(
@@ -77,5 +79,12 @@ export FZF_DEFAULT_OPTS="--height 40% --reverse --border"
 
 
 
+#------------Pure Themes-------------
+# https://github.com/sindresorhus/pure
+# ------------------------------------
+fpath+=$HOME/.zsh/pure
+autoload -U promptinit; promptinit
+prompt pure
+style="%D{%L:%M:%S} $PROMPT"
+PROMPT=$style
 
-export LANG=en_US.UTF-8
