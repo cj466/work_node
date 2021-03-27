@@ -20,24 +20,26 @@ end_info(){
 }
 
 
-
-
 add_user(){
     read -p "请输入创建的用户名 默认为[Admin]: " username
-    local username
     
-    if [ -z "$username" ];then
-        id Admin > /dev/null 2>&1
-        
+    if [ -n "$username" ];then
+        id $username
+
+
         if [ $? != 0 ];then 
-	        useradd Admin
-	        echo Adminpasswd | passwd --stdin Admin > /dev/null
+	        useradd $username
+	        echo Adminpasswd | passwd --stdin $username > /dev/null
+		
             echo -e "\033[1;31m Username: Admin  Passwd: Adminpasswd \033[0m"
         else
-            echo Adminpasswd | passwd --stdin Admin > /dev/null
+	
+            echo Adminpasswd | passwd --stdin $username > /dev/null
             echo -e "\033[1;31m Username: Admin  Passwd: Adminpasswd \033[0m"
         fi
     else
+       useradd Admin
+       username="Admin"
        echo Adminpasswd | passwd --stdin Admin > /dev/null
        echo -e "\033[1;31m Username: $username  Passwd: Adminpasswd \033[0m"
     fi
@@ -45,10 +47,10 @@ add_user(){
 
 
 url_check(){
-    check=a=$(curl -s "$key_url" | grep ^ssh-rsa)
+    check=$(curl -s "$key_url" | grep ^ssh-rsa)
     
-    if [ -n "$check"]; then
-        curl $key_url >> /home/$username/.ssh/authorized_keys
+    if [[ $check != "" ]]; then
+        curl $key_url > /home/$username/.ssh/authorized_keys
         chmod 644  /home/$username/.ssh/authorized_keys
     else
         echo "url 错误"
@@ -60,7 +62,7 @@ url_check(){
 id_key_pub(){
 # 配置密钥
 
-read -p "是否为 ${uaername} 配置免密登录: [Y/N]" YN
+read -p "是否为 ${username} 配置免密登录: [Y/N]" YN
 
 case $YN in 
     [Yy][Ee][Ss]|[Yy])
@@ -68,10 +70,11 @@ case $YN in
         
         if [ -f /home/$username/.ssh/authorized_keys ];then
 
-            mkdir -p /home/$username/.ssh > /dev/null 2>&1
+	    chown -R $username:$username /home/$username/.ssh
             url_check
         else
             mkdir -p /home/$username/.ssh && chmod 700 /home/$username/.ssh
+	    chown -R $username:$username /home/$username/.ssh
             url_check
         fi
     ;;
@@ -86,6 +89,7 @@ sshd_conf(){
 
 sed -i 's/^GSSAPIAuthentication yes$/GSSAPIAuthentication no/' /etc/ssh/sshd_config  
 sed -i 's/#UseDNS yes/UseDNS no/' /etc/ssh/sshd_config  
+sed -i 's/#PubkeyAuthentication/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
 }
 
@@ -94,9 +98,8 @@ install_package(){
 
 
     echo "aliyun.mirror"
-    mv /etc/yum.repo.d/CentOS-Base.repo /etc/yum.repo.d/CentOS-Base.repo.backup
-    curl -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo > /dev/null
-    
+    mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.backup
+    curl https://mirrors.163.com/.help/CentOS7-Base-163.repo > /etc/yum.repos.d/CentOS-Base.repo
     yum clean all
     
     yum makecache fast
@@ -141,7 +144,7 @@ update_ssh(){
     
     wget --http-user=caictipv6 --http-password=admin2real@rittgxb https://software.topwiki.org/openssl/openssl-1.1.1j.tar.gz
     
-    tar add openssl-1.1.1j.tar.gz 
+    tar zxf openssl-1.1.1j.tar.gz 
     
     cd openssl-1.1.1j
     
@@ -314,7 +317,7 @@ firewalld(){
     
     iptables-save
 
-
+}
 main(){
     add_user
     sshd_conf
