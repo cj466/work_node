@@ -1,7 +1,8 @@
 #!bin/bash
 
 
-echo -e "网站名称\t网站域名\t是否具有AAAA记录\t解析是否需要www\t\t网站IPv6地址\t\t\t首页是否支持IPv6可访问\tIPv6状态代码"
+echo -e "网站名称\t网站域名\t是否具有AAAA记录\t解析是否需要www\t网站IPv6地址\t首页是否支持IPv6可访问\tIPv6状态代码" >> target.txt
+echo -e "网站名称\t网站域名\t是否具有AAAA记录\t解析是否需要www\t网站IPv6地址\t首页是否支持IPv6可访问\tIPv6状态代码" 
 # 定义dns服务器
 
 
@@ -58,13 +59,14 @@ do
 
 ###### 网站名称 网站域名 ########
 
-    weburl=$(echo ${line%/*} | awk '{print $2}')
+    weburl=$(echo ${line%%/*} | awk '{print $2}')
     sitename=$(echo $line | awk '{print $1}')
 
     web4a
     testurl   
 
-echo -e "$sitename\t$weburl\t\t$str4a\t\t$addwww\t\t\t$recode4a\t\t$statusIPv6Access\t\t\t$status_code $status_codes" 
+echo -e "$sitename\t$weburl\t$str4a\t$addwww\t$recode4a\t$statusIPv6Access\t$status_code  $status_codes">>target.txt 
+echo -e "$sitename\t$weburl\t$str4a\t$addwww\t$recode4a\t$statusIPv6Access\t$status_code  $status_codes"
 
 #| awk -F, '{printf "%-15s %-15s %-10s %-10s %-15s %-15s %-8s\n",$1,$2,$3,$4,$5,$6,$7}' 
 
