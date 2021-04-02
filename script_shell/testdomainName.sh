@@ -34,12 +34,12 @@ testurl(){
 
     
     if [[ ${addwww} == "需要" ]];then
-        status_code=$(curl -6 -L -I -m 10 -o /dev/null -s -w %{http_code} "www.$weburl")
-        status_codes=$(curl -6 -L -I -m 10 -o /dev/null -s -w %{http_code} "https://www.$weburl")
+        status_code=$(curl -6 -L -m 10 -o /dev/null -s -w %{http_code} "www.$weburl")
+        status_codes=$(curl -6 -L -m 10 -o /dev/null -s -w %{http_code} "https://www.$weburl")
     else
         addwww="不需要"        
-        status_code=$(curl -6 -L -I -m 10 -o /dev/null -s -w %{http_code} "$weburl")
-        status_codes=$(curl -6 -L -I -m 10 -o /dev/null -s -w %{http_code} "https://$weburl") 
+        status_code=$(curl -6 -L  -m 10 -o /dev/null -s -w %{http_code} "$weburl")
+        status_codes=$(curl -6 -L  -m 10 -o /dev/null -s -w %{http_code} "https://$weburl") 
     fi
 
     if [ "$status_code" == "200" ] || [ "$status_codes" == "200" ];then
