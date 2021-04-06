@@ -19,7 +19,7 @@ web4a(){
         
 	recode4a=`dig aaaa  "www.$weburl" +short | egrep -o "([\da-fA-F0-9]{1,4}(:{1,2})){1,15}[\da-fA-F0-9]{1,4}$" | head -n 1`
        # recode4a=$(nslookup -type=AAAA -timeout=5 "www.$weburl" $v6ns | sed -n /[Aa]ddress/p | egrep -o "([\da-fA-F0-9]{1,4}(:{1,2})){1,15}[\da-fA-F0-9]{1,4}$")
-        if [ -n $recode4a ]; then
+        if [ -n "$recode4a" ]; then
             str4a="有"
             addwww="需要"
         else
@@ -54,6 +54,8 @@ testurl(){
 
 
 # 数据处理主体
+count=0
+filecount=`cat source.txt | wc -l`
 while read line
 do
 
@@ -64,15 +66,18 @@ do
 
     web4a
     testurl   
+	
+    echo -e "$sitename\t$weburl\t$str4a\t$addwww\t$recode4a\t$statusIPv6Access\t$status_code  $status_codes">>target.txt 
+    echo -e "$sitename\t$weburl\t$str4a\t$addwww\t$recode4a\t$statusIPv6Access\t$status_code  $status_codes"
 
-echo -e "$sitename\t$weburl\t$str4a\t$addwww\t$recode4a\t$statusIPv6Access\t$status_code  $status_codes">>target.txt 
-echo -e "$sitename\t$weburl\t$str4a\t$addwww\t$recode4a\t$statusIPv6Access\t$status_code  $status_codes"
+    count=$((count+1))
 
-#| awk -F, '{printf "%-15s %-15s %-10s %-10s %-15s %-15s %-8s\n",$1,$2,$3,$4,$5,$6,$7}' 
+done < "source.txt"
 
-done < source.txt
-
-echo "数据处理完成"
-exit 0
-
-
+if [[ "$count" -eq "$filecount" ]]; then
+	echo "数据处理完成！"
+	exit 0
+else
+	echo "数据处理不完整,缺失某行数据"
+	exit 100	
+fi
